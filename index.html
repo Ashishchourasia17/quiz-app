@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game</title>
+   
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1f4037, #99f2c8);
+            color: #ffffff;
+            margin: 0;
+        }
+        .quiz-container {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            width: 350px;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        h1 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        .btn-container button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            color: #333;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        .btn-container button:hover {
+            background: #e0e0e0;
+            transform: scale(1.05);
+        }
+        .btn-container button.correct {
+            background: #28a745;
+            color: white;
+        }
+        .btn-container button.wrong {
+            background: #dc3545;
+            color: white;
+        }
+        #next-btn, #restart-btn {
+            margin-top: 15px;
+            padding: 12px;
+            cursor: pointer;
+            background: #f8f9fa;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: 0.3s;
+            display: none;
+            font-weight: 500;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        #next-btn:hover, #restart-btn:hover {
+            background: #e0e0e0;
+            transform: scale(1.05);
+        }
+        .hidden {
+            display: none;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Quiz-Game</h1>
+        <div id="question-container">
+            <p id="question">Question text</p>
+            <div id="answer-buttons" class="btn-container"></div>
+        </div>
+        <button id="next-btn">Next</button>
+        <p id="score" class="hidden"></p>
+        <button id="restart-btn" class="hidden">Restart Quiz</button>
+    </div>
+    <script>
+        const questions = [
+            { question: "Who has the most international centuries?", answers: ["Sachin Tendulkar", "Rohit Sharma", "Virat Kohli", "MS Dhoni"], correct: "Sachin Tendulkar" },
+            { question: "What is the capital of Germany?", answers: ["Berlin", "Madrid", "Paris", "Rome"], correct: "Berlin" },
+            { question: "What is the largest planet?", answers: ["Earth", "Mars", "Jupiter", "Venus"], correct: "Jupiter" },
+            { question: "Who wrote 'Hamlet'?", answers: ["Shakespeare", "Hemingway", "Tolkien", "Rowling"], correct: "Shakespeare" },
+            { question: "Which is the fastest land animal?", answers: ["Cheetah", "Lion", "Horse", "Kangaroo"], correct: "Cheetah" }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const questionElement = document.getElementById("question");
+        const answerButtons = document.getElementById("answer-buttons");
+        const nextButton = document.getElementById("next-btn");
+        const restartButton = document.getElementById("restart-btn");
+        const scoreElement = document.getElementById("score");
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            nextButton.style.display = "none";
+            restartButton.classList.add("hidden");
+            scoreElement.classList.add("hidden");
+            showQuestion();
+        }
+
+        function showQuestion() {
+            resetState();
+            const currentQuestion = questions[currentQuestionIndex];
+            questionElement.innerText = currentQuestion.question;
+            
+            shuffleArray(currentQuestion.answers).forEach(answer => {
+                const button = document.createElement("button");
+                button.innerText = answer;
+                button.classList.add("btn");
+                button.addEventListener("click", () => selectAnswer(button, answer, currentQuestion.correct));
+                answerButtons.appendChild(button);
+            });
+        }
+
+        function resetState() {
+            answerButtons.innerHTML = "";
+            nextButton.style.display = "none";
+        }
+
+        function selectAnswer(button, selected, correct) {
+            if (selected === correct) {
+                button.classList.add("correct");
+                score++;
+            } else {
+                button.classList.add("wrong");
+            }
+            Array.from(answerButtons.children).forEach(btn => {
+                btn.disabled = true; 
+                btn.style.pointerEvents = "none";
+            });
+            nextButton.style.display = "block";
+        }
+
+        nextButton.addEventListener("click", () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                showScore();
+            }
+        });
+
+        function showScore() {
+            questionElement.innerText = "Quiz Completed!";
+            answerButtons.innerHTML = "";
+            scoreElement.innerText = `Your Score: ${score}/${questions.length}`;
+            scoreElement.classList.remove("hidden");
+            nextButton.style.display = "none";
+            restartButton.classList.remove("hidden");
+        }
+
+        restartButton.addEventListener("click", startQuiz);
+
+        function shuffleArray(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        startQuiz();
+    </script>
+</body>
+</html>
